@@ -21,7 +21,7 @@ Most health apps keep your data in "walled gardens." BioSync brings everything t
 - **Smart Monitoring**: Track Steps, Sleep, HR, SpO2, and HRV in one sleek Glassmorphism interface.
 - **Environment Sensing**: Know if your room's air quality (CO2) or temperature is affecting your recovery.
 - **AI Nutrition**: Just scan your food to get instant macro and calorie breakdowns via OpenAI.
-- **Vitality Score**: A custom Random Forest ML model predicts your physical readiness based on 10+ biological markers.
+- **Vitality Score**: A custom Gradient boosting ML model predicts your physical readiness based on 10+ biological markers.
 
 ## 🛠️ Built With
 - **Mobile**: Capacitor.js + Kotlin (Native Android Health Bridge)
