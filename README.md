@@ -43,4 +43,16 @@ python run.py
 - `/biosync_arduino`: Hardware code for secondary sensor nodes.
 
 ---
-*Created with ❤️ for a privacy-first health future.*
+## 🔌 Hardware Requirements
+To use the full "Pure Real" sync features of BioSync, you will need:
+- **Wearable**: A Samsung Galaxy Watch (or any Wear OS device) connected to Android Health Connect.
+- **IoT Hub**: A Raspberry Pi 5 (or Pi 4) running the `pi_sensor_server.py` script.
+- **Environment Sensors**: DHT22 (Temp/Humidity) and MQ135 (Air Quality) connected to the Pi via GPIO.
+- **Mobile Device**: An Android smartphone running the BioSync `.apk` (Android 13+ recommended for Health Connect stability).
+---
+## 📄 License
+This project is licensed under the **MIT License**. You are free to use, modify, and distribute this software for academic or personal projects, provided that proper credit is given to the original repository.
+
+---
+*BioSync © 2026. Developed for the advancement of decentralized health intelligence.*
+
