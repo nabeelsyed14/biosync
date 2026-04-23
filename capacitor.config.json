@@ -1,0 +1,14 @@
+{
+  "appId": "com.biosync.v2",
+  "appName": "BioSync",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  },
+  "server": {
+    "cleartext": true
+  }
+}

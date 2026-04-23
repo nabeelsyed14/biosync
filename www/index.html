@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>BioSync | Health Intelligence</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Supabase & Charts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/styles.css?v=3.0">
+</head>
+<body>
+
+    <div class="app-shell">
+
+        <!-- ===== TOP HEADER ===== -->
+        <header class="mobile-header">
+            <div class="header-brand">
+                <img src="biosync_logo.png" alt="BioSync Logo" class="header-logo">
+                <span class="header-title">BioSync</span>
+            </div>
+            <div class="header-actions">
+                <!-- Health Connect Sync Button -->
+                <button class="icon-btn" id="health-connect-btn" title="Sync Health Connect">
+                    <i class="fa-solid fa-heart-pulse"></i>
+                </button>
+                <!-- Dark / Light Mode Toggle -->
+                <button class="icon-btn" id="theme-toggle-btn" title="Toggle Theme">
+                    <i class="fa-solid fa-moon" id="theme-icon"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- ===== HEALTH CONNECT SYNC BANNER (shown after tap) ===== -->
+        <div id="hc-banner" class="hc-banner hidden">
+            <i class="fa-solid fa-circle-notch fa-spin"></i>
+            <span id="hc-banner-text">Connecting to Health Connect...</span>
+        </div>
+
+        <!-- ===== MAIN SCROLLABLE CONTENT ===== -->
+        <main class="main-scroll" id="page-dashboard">
+
+            <!-- Greeting -->
+            <section class="greeting-section">
+                <div>
+                    <h1 class="greeting-title">Good <span id="greeting-time">Morning</span></h1>
+                    <p class="greeting-sub" id="sidebar-name">Loading profile...</p>
+                </div>
+                <div id="sync-status" class="sync-pill syncing">
+                    <i class="fa-solid fa-arrows-rotate fa-spin"></i>
+                    <span>Syncing</span>
+                </div>
+            </section>
+
+            <!-- ===== READINESS CARD ===== -->
+            <section class="readiness-hero glass-card">
+                <div class="readiness-ring-container">
+                    <svg class="readiness-ring" viewBox="0 0 120 120">
+                        <circle cx="60" cy="60" r="50" class="ring-bg"/>
+                        <circle cx="60" cy="60" r="50" class="ring-fill" id="readiness-ring-fill" style="stroke-dashoffset: 220;"/>
+                    </svg>
+                    <div class="readiness-center">
+                        <div class="readiness-value" id="readiness-val">--</div>
+                        <div class="readiness-label">Readiness</div>
+                    </div>
+                </div>
+                <div class="readiness-stats">
+                    <div class="r-stat">
+                        <i class="fa-solid fa-shoe-prints accent-blue"></i>
+                        <span class="r-val" id="step-count">0</span>
+                        <span class="r-lbl">Steps</span>
+                    </div>
+                    <div class="r-stat">
+                        <i class="fa-solid fa-bed accent-purple"></i>
+                        <span class="r-val"><span id="sleep-duration">0</span>h</span>
+                        <span class="r-lbl">Sleep</span>
+                    </div>
+                    <div class="r-stat">
+                        <i class="fa-solid fa-wave-square accent-red"></i>
+                        <span class="r-val"><span id="heart-rate">--</span></span>
+                        <span class="r-lbl">HR bpm</span>
+                    </div>
+                    <div class="r-stat">
+                        <i class="fa-solid fa-lungs accent-cyan"></i>
+                        <span class="r-val"><span id="spo2-display">--</span>%</span>
+                        <span class="r-lbl">SpO₂</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== XP / LEVEL BAR ===== -->
+            <section class="xp-section glass-card">
+                <div class="xp-info">
+                    <span class="xp-label">Level <span id="user-level">1</span></span>
+                    <span class="xp-count"><span id="sidebar-current-xp">0</span> / <span id="sidebar-next-xp">100</span> XP</span>
+                </div>
+                <div class="xp-track">
+                    <div class="xp-fill" id="sidebar-xp-bar"></div>
+                </div>
+            </section>
+
+            <!-- ===== ACTIVITY / NUTRITION ROW ===== -->
+            <div class="two-col-row">
+                <!-- Nutrition Quick Log -->
+                <div class="glass-card half-card" id="card-nutrition">
+                    <div class="card-head">
+                        <i class="fa-solid fa-utensils accent-green"></i>
+                        <span>Calories</span>
+                    </div>
+                    <div class="big-num" id="calories-display">0</div>
+                    <div class="card-sub">/ 2250 kcal</div>
+                    <div class="card-sub" id="latest-meal-container" style="display:none;">
+                        <i class="fa-solid fa-clock-rotate-left"></i> <span id="latest-meal-name">---</span>
+                    </div>
+                    <input type="file" id="meal-image-input" accept="image/*" style="display:none;">
+                    <button class="small-btn" id="log-meal-btn">
+                        <i class="fa-solid fa-camera"></i> Scan
+                    </button>
+                </div>
+
+                <!-- SpO2 + HR mini card -->
+                <div class="glass-card half-card">
+                    <div class="card-head">
+                        <i class="fa-solid fa-heart-pulse accent-red"></i>
+                        <span>Vitals</span>
+                    </div>
+                    <div class="vitals-mini">
+                        <div class="vital-row">
+                            <i class="fa-solid fa-lungs accent-cyan"></i>
+                            <div>
+                                <div class="vital-val"><span id="spo2-mini">--</span>%</div>
+                                <div class="vital-lbl">SpO₂</div>
+                            </div>
+                        </div>
+                        <div class="vital-row">
+                            <i class="fa-solid fa-wave-square accent-red"></i>
+                            <div>
+                                <div class="vital-val"><span id="hr-mini">--</span> bpm</div>
+                                <div class="vital-lbl">Heart Rate</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== ATMOSPHERE CARD ===== -->
+            <section class="glass-card atmosphere-card" id="card-atmosphere">
+                <div class="card-head">
+                    <i class="fa-solid fa-earth-asia accent-blue"></i>
+                    <span>Atmosphere</span>
+                    <div class="env-tabs">
+                        <button class="env-tab active" id="tab-outdoor">☀️ Outdoor</button>
+                        <button class="env-tab" id="tab-indoor">🏠 Indoor</button>
+                    </div>
+                </div>
+
+                <!-- Outdoor Panel -->
+                <div id="env-panel-outdoor" class="env-panel">
+                    <div class="env-grid">
+                        <div class="env-metric">
+                            <i class="fa-solid fa-temperature-half accent-orange"></i>
+                            <div><div class="env-val" id="out-temp">--</div><div class="env-lbl">Temp</div></div>
+                        </div>
+                        <div class="env-metric">
+                            <i class="fa-solid fa-droplet accent-blue"></i>
+                            <div><div class="env-val" id="out-humidity">--</div><div class="env-lbl">Humidity</div></div>
+                        </div>
+                        <div class="env-metric">
+                            <i class="fa-solid fa-sun accent-yellow"></i>
+                            <div><div class="env-val" id="out-uv">--</div><div class="env-lbl">UV Index</div></div>
+                        </div>
+                        <div class="env-metric">
+                            <i class="fa-solid fa-smog accent-red"></i>
+                            <div><div class="env-val" id="out-aqi">--</div><div class="env-lbl">AQI</div></div>
+                        </div>
+                    </div>
+                    <div class="env-advice" id="env-advice-outdoor">📍 Fetching location...</div>
+                </div>
+
+                <!-- Indoor Panel (Raspberry Pi sensor data) -->
+                <div id="env-panel-indoor" class="env-panel hidden">
+                    <div class="env-grid">
+                        <div class="env-metric">
+                            <i class="fa-solid fa-lightbulb accent-yellow"></i>
+                            <div><div class="env-val" id="in-lux">--</div><div class="env-lbl">Lux</div></div>
+                        </div>
+                        <div class="env-metric">
+                            <i class="fa-solid fa-temperature-half accent-orange"></i>
+                            <div><div class="env-val" id="in-temp">--</div><div class="env-lbl">Temp</div></div>
+                        </div>
+                        <div class="env-metric">
+                            <i class="fa-solid fa-droplet accent-blue"></i>
+                            <div><div class="env-val" id="in-humidity">--</div><div class="env-lbl">Humidity</div></div>
+                        </div>
+                        <div class="env-metric">
+                            <i class="fa-solid fa-wind accent-green"></i>
+                            <div><div class="env-val" id="in-co2">--</div><div class="env-lbl">CO₂ ppm</div></div>
+                        </div>
+                    </div>
+                    <div class="env-advice" id="env-advice-indoor">🍓 Connecting to Raspberry Pi...</div>
+                </div>
+            </section>
+
+            <!-- ===== HRV WIDGET (Replaced Mood) ===== -->
+            <section class="glass-card">
+                <div class="card-head">
+                    <i class="fa-solid fa-heart-circle-bolt accent-purple"></i>
+                    <span>Nervous System Stress</span>
+                </div>
+                <div style="display:flex; align-items:flex-end; gap: 12px; margin: 12px 0;">
+                    <div class="big-num" id="hrv-display">--</div>
+                    <div class="card-sub" style="margin-bottom: 6px;">ms (RMSSD)</div>
+                </div>
+                <p id="hrv-feedback" class="feedback-text">Syncing with Galaxy Watch to measure systemic recovery...</p>
+                <div class="xp-track" style="margin-top:10px; background: rgba(255,255,255,0.05);"><div class="xp-fill" id="hrv-bar" style="width:0%; background: var(--accent-purple);"></div></div>
+            </section>
+
+            <!-- ===== AI INSIGHT FEED ===== -->
+            <section class="glass-card">
+                <div class="card-head">
+                    <i class="fa-solid fa-microchip accent-blue"></i>
+                    <span>Bio-Intelligence Feed</span>
+                    <span class="badge-small">AI</span>
+                </div>
+                <ul class="insight-list" id="ai-insight-list">
+                    <li class="insight-item processing">Analyzing health signature...</li>
+                </ul>
+            </section>
+
+            <!-- Bottom padding so content doesn't hide behind nav bar -->
+            <div style="height: 100px;"></div>
+        </main>
+
+        <!-- ===== ANALYTICS PAGE (hidden by default) ===== -->
+        <main class="main-scroll hidden" id="page-analytics">
+            <section class="page-title-bar">
+                <h2>Vitality Hub</h2>
+            </section>
+
+            <section class="analytics-hero-mobile">
+                <div class="a-card glass-card neon-blue">
+                    <span class="a-label">Vitality Index</span>
+                    <div class="a-val" id="vitality-index">--</div>
+                    <span class="a-desc">Systemic Health</span>
+                </div>
+                <div class="a-card glass-card neon-purple">
+                    <span class="a-label">Readiness</span>
+                    <div class="a-val" id="readiness-score">--</div>
+                    <span class="a-desc">ML Prediction</span>
+                </div>
+            </section>
+
+            <section class="glass-card narrative-card">
+                <i class="fa-solid fa-brain accent-purple"></i>
+                <p id="narrative-desc">The neural engine is analyzing your sleep and step correlation to forecast readiness.</p>
+            </section>
+
+            <div class="pill-row">
+                <button class="pill-btn active" data-target="steps">Movement</button>
+                <button class="pill-btn" data-target="sleep">Restoration</button>
+            </div>
+
+            <section class="graph-box glass-card">
+                <div class="chart-container active" id="container-steps">
+                    <canvas id="chart-steps"></canvas>
+                </div>
+                <div class="chart-container" id="container-sleep">
+                    <canvas id="chart-sleep"></canvas>
+                </div>
+            </section>
+
+            <div style="height: 100px;"></div>
+        </main>
+
+        <!-- ===== GOALS PAGE ===== -->
+        <main class="main-scroll hidden" id="page-goals">
+            <section class="page-title-bar">
+                <h2>Goals & Progress</h2>
+            </section>
+
+            <section class="glass-card">
+                <div class="goal-item">
+                    <div class="goal-lbl">Daily Steps <span class="accent-blue">10,000</span></div>
+                    <div class="xp-track"><div class="xp-fill" id="goal-steps-bar" style="width:0%; background: var(--accent-red)"></div></div>
+                </div>
+                <div class="goal-item">
+                    <div class="goal-lbl">Sleep Goal <span class="accent-blue">8 Hours</span></div>
+                    <div class="xp-track"><div class="xp-fill" id="goal-sleep-bar" style="width:0%; background: var(--accent-blue)"></div></div>
+                </div>
+                <div class="goal-item">
+                    <div class="goal-lbl">Nutrition <span class="accent-green">2,500 kcal</span></div>
+                    <div class="xp-track"><div class="xp-fill" id="goal-nutrition-bar" style="width:0%; background: var(--accent-green)"></div></div>
+                </div>
+            </section>
+
+            <section class="glass-card">
+                <div class="card-head">
+                    <i class="fa-solid fa-crown accent-gold"></i>
+                    <span>Experience Pipeline</span>
+                </div>
+                <p class="card-sub" style="margin-bottom:10px;">Reach Level 5 to unlock Deep Analytics</p>
+                <div class="xp-track"><div class="xp-fill" style="width:10%;" id="goals-xp-bar"></div></div>
+            </section>
+
+            <section class="glass-card">
+                <div class="card-head">
+                    <i class="fa-solid fa-trophy accent-gold"></i>
+                    <span>Dynamic Challenges</span>
+                </div>
+                <div class="challenges-list" id="challenges-list-mobile">
+                    <!-- Dynamically rendered -->
+                </div>
+            </section>
+
+            <div style="height: 100px;"></div>
+        </main>
+
+        <!-- ===== SETTINGS PAGE ===== -->
+        <main class="main-scroll hidden" id="page-settings">
+            <section class="page-title-bar">
+                <h2>Settings</h2>
+            </section>
+
+            <!-- Profile -->
+            <section class="glass-card settings-section">
+                <div class="card-head">
+                    <i class="fa-solid fa-user accent-blue"></i>
+                    <span>Profile</span>
+                </div>
+                <div class="profile-display">
+                    <div class="emoji-avatar" id="sidebar-emoji">👤</div>
+                    <h3 id="settings-name-display">User</h3>
+                </div>
+            </section>
+
+            <!-- Body Architecture -->
+            <section class="glass-card settings-section">
+                <div class="card-head">
+                    <i class="fa-solid fa-dumbbell accent-green"></i>
+                    <span>Body Architecture</span>
+                </div>
+                <div class="form-group">
+                    <label>Age</label>
+                    <input type="number" id="stats-age" class="form-input" value="25">
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="stats-gender" class="form-input">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group flex-1">
+                        <label>Weight (kg)</label>
+                        <input type="number" id="stats-weight" class="form-input" value="70">
+                    </div>
+                    <div class="form-group flex-1">
+                        <label>Height (cm)</label>
+                        <input type="number" id="stats-height" class="form-input" value="175">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Activity Level</label>
+                    <select id="stats-activity" class="form-input">
+                        <option value="low">Sedentary</option>
+                        <option value="moderate" selected>Moderate</option>
+                        <option value="high">Athlete</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Hardware Configuration -->
+            <section class="glass-card settings-section">
+                <div class="card-head">
+                    <i class="fa-solid fa-server accent-blue"></i>
+                    <span>Hardware Node</span>
+                </div>
+                <div class="form-group">
+                    <label>Host Pi Address (IP:Port)</label>
+                    <input type="url" id="biosync-pi-ip" class="form-input" placeholder="http://192.168.1.120:5000">
+                    <small style="color: var(--text-secondary); font-size: 0.65rem; display: block; margin-top: 4px;">Point to your Raspberry Pi's local API. Used for sensor data and OLED updates.</small>
+                </div>
+            </section>
+
+            <!-- AI Configuration -->
+            <section class="glass-card settings-section">
+                <div class="card-head">
+                    <i class="fa-solid fa-microchip accent-purple"></i>
+                    <span>AI Configuration</span>
+                </div>
+                <div class="form-group">
+                    <label>OpenAI API Key (sk-...)</label>
+                    <input type="password" id="openai-api-key" class="form-input" placeholder="Enter your OpenAI key">
+                    <small style="color: var(--text-secondary); font-size: 0.65rem; display: block; margin-top: 4px;">Used for AI food detection. Saved locally on your device.</small>
+                </div>
+            </section>
+
+            <!-- Preferences -->
+            <section class="glass-card settings-section">
+                <div class="card-head">
+                    <i class="fa-solid fa-sliders accent-purple"></i>
+                    <span>Preferences</span>
+                </div>
+                <div class="setting-row">
+                    <span>Neural Audio Feedback</span>
+                    <button id="toggle-sound-btn" class="small-btn">
+                        <i class="fa-solid fa-volume-high"></i> <span id="sound-status-text">On</span>
+                    </button>
+                </div>
+                <div class="setting-row">
+                    <span>Dark Mode</span>
+                    <button id="theme-toggle-settings" class="small-btn">
+                        <i class="fa-solid fa-moon" id="theme-icon-settings"></i> <span id="theme-text">Dark</span>
+                    </button>
+                </div>
+            </section>
+
+            <button id="save-settings-btn" class="full-btn">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Sync Profile to Cloud
+            </button>
+
+            <div style="height: 100px;"></div>
+        </main>
+
+        <!-- ===== BOTTOM NAVIGATION BAR ===== -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-page="dashboard">
+                <i class="fa-solid fa-border-all"></i>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" data-page="analytics" id="open-analytics-btn">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Analytics</span>
+            </button>
+            <button class="nav-item" data-page="goals" id="open-goals-btn">
+                <i class="fa-solid fa-bullseye"></i>
+                <span>Goals</span>
+            </button>
+            <button class="nav-item" data-page="settings" id="open-settings-btn">
+                <i class="fa-solid fa-gear"></i>
+                <span>Settings</span>
+            </button>
+        </nav>
+
+        <!-- ===== MEAL LOG MODAL ===== -->
+        <div id="meal-log-modal" class="modal-overlay hidden">
+            <div class="modal-sheet">
+                <div class="sheet-handle"></div>
+                <div class="modal-header">
+                    <h2><i class="fa-solid fa-utensils accent-green"></i> Meal Analysis</h2>
+                    <button id="close-meal-modal-btn" class="close-btn"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+                <div id="meal-log-content" class="modal-body"></div>
+            </div>
+        </div>
+
+        <!-- ===== XP TOAST ===== -->
+        <div id="xp-toast-container"></div>
+    </div>
+
+    <!-- ===== ONBOARDING MODAL OVERLAY ===== -->
+    <div id="onboarding-overlay" class="modal-overlay hidden" style="background: var(--bg-base); z-index: 9999;">
+        <div class="modal-sheet" style="height: 100vh; max-height: 100vh; border-radius: 0; padding: 40px 24px; display: flex; flex-direction: column;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                <img src="biosync_logo.png" alt="BioSync Logo" style="width: 64px; height: 64px; border-radius: 16px; margin-bottom: 16px;">
+                <h1 style="font-size: 2rem; font-weight: 800; color: var(--text-primary);">BioSync<span style="color: var(--accent-blue);">AI</span></h1>
+                <p style="color: var(--text-secondary); margin-top: 8px;">Initialize your physical twin to calibrate the predictive engine.</p>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+                <label>Identifier (Name)</label>
+                <input type="text" id="onboarding-name" class="form-input" placeholder="e.g. Alex">
+            </div>
+
+            <div class="form-row" style="margin-bottom: 16px;">
+                <div class="form-group flex-1">
+                    <label>Age</label>
+                    <input type="number" id="onboarding-age" class="form-input" value="25">
+                </div>
+                <div class="form-group flex-1">
+                    <label>Gender</label>
+                    <select id="onboarding-gender" class="form-input">
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row" style="margin-bottom: 16px;">
+                <div class="form-group flex-1">
+                    <label>Weight (kg)</label>
+                    <input type="number" id="onboarding-weight" class="form-input" value="70">
+                </div>
+                <div class="form-group flex-1">
+                    <label>Height (cm)</label>
+                    <input type="number" id="onboarding-height" class="form-input" value="175">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 24px;">
+                <label>Select Avatar Icon</label>
+                <div style="display: flex; justify-content: space-between; font-size: 2rem; margin-top: 8px;" id="avatar-selector">
+                    <span class="emoji-btn avatar-btn selected" style="cursor:pointer; padding:6px; background: rgba(30,144,255,0.1); border-radius: 12px; border: 2px solid var(--accent-blue);" data-icon="👤">👤</span>
+                    <span class="emoji-btn avatar-btn" style="cursor:pointer; padding:6px; border: 2px solid transparent;" data-icon="🥷">🥷</span>
+                    <span class="emoji-btn avatar-btn" style="cursor:pointer; padding:6px; border: 2px solid transparent;" data-icon="👩‍🚀">👩‍🚀</span>
+                    <span class="emoji-btn avatar-btn" style="cursor:pointer; padding:6px; border: 2px solid transparent;" data-icon="🤖">🤖</span>
+                    <span class="emoji-btn avatar-btn" style="cursor:pointer; padding:6px; border: 2px solid transparent;" data-icon="👽">👽</span>
+                </div>
+            </div>
+
+            <div style="margin-top: auto;">
+                <button id="complete-onboarding-btn" class="full-btn" style="padding: 18px; font-size: 1.1rem;">Install Architecture <i class="fa-solid fa-arrow-right"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/config.js?v=3.0"></script>
+    <script src="js/sync-engine.js?v=3.0"></script>
+    <script src="js/gamification.js?v=3.0"></script>
+    <script src="js/audio-engine.js?v=3.0"></script>
+    <script src="js/app.js?v=3.0"></script>
+</body>
+</html>

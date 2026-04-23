@@ -1,0 +1,17 @@
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+joblib
+flask
+paho-mqtt
+pyserial
+pillow
+supabase
+python-dotenv
+# Hardware-specific (Raspberry Pi)
+# adafruit-circuitpython-dht
+# adafruit-circuitpython-ssd1306
+# gpiozero
+# RPi.GPIO

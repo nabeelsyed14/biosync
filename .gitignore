@@ -1,0 +1,39 @@
+# Environments
+.env
+.env.example
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build and IDE
+dist/
+build/
+bin/
+obj/
+.idea/
+.vscode/
+.gradle/
+platforms/
+plugins/
+*.apk
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# OS Junk
+.DS_Store
+Thumbs.db
+
+# Project Scratch
+scratch/
+implementation_plan.md
+task.md
+walkthrough.md
