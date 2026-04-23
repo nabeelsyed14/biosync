@@ -61,6 +61,12 @@ To use the full "Pure Real" sync features of BioSync, you will need:
 - **Environment Sensors**: DHT22 (Temp/Humidity) and MQ135 (Air Quality) connected to the Pi via GPIO.
 - **Mobile Device**: An Android smartphone running the BioSync `.apk` (Android 13+ recommended for Health Connect stability).
 ---
+## 👥 Collaborators
+This project was a collaborative effort. Special thanks to:
+- **[Mohammad Suhayl]** ([@suhayl05](https://github.com/suhayl05)) – Lead Hardware Engineer / Sensor Calibration.
+- **[Abdul Rahman]** ([@Abdxlrahman](https://github.com/Abdxlrahman)) – Data Scientist / ML Model Optimization.
+- **[Nabeel Syed]** ([@nabeelsyed14](https://github.com/nabeelsyed14)) – Full-stack Developer / Native Android Bridge.
+---
 ## 📄 License
 This project is licensed under the **MIT License**. You are free to use, modify, and distribute this software for academic or personal projects, provided that proper credit is given to the original repository.
 
