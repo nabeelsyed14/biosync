@@ -1,7 +1,18 @@
-# BioSync 🧬
-**A Privacy-First, Mobile Health Intelligence Platform**
+# BioSync 🧬 
 
-BioSync is a futuristic health dashboard that connects your body with your environment. By combining data from wearables (Galaxy Watch/Health Connect) and IoT sensors (Raspberry Pi), BioSync uses Machine Learning to give you a real-time **Vitality Index**—telling you exactly how ready you are for the day.
+**The ultimate 360° view of your health and environment.** 🚀
+
+BioSync is a powerful, real-time health intelligence platform that syncs your biological vitals with your physical environment. By bridging your **Galaxy Watch** and a **Raspberry Pi IoT hub**, BioSync uses a custom Random Forest ML model to calculate your **Vitality Index**—giving you a daily score on your readiness to perform! ⚡️
+
+---
+
+## 🌟 Top Features
+- **⌚️ Smart Sync**: Direct integration with Health Connect for Steps, Sleep, HR, and HRV.
+- **🏠 Home Atmosphere**: Real-time Indoor Air Quality (CO2), Temp, and Humidity tracking via Raspberry Pi.
+- **🍎 AI Nutrition**: Snap a photo of your food to get instant calorie and macro breakdowns using OpenAI!
+- **🤖 Neuro-ML Engine**: A smart "Vitality Index" that learns from your habits to predict your physical state.
+- **🎮 Gamified Growth**: Earn XP, level up, and unlock badges as you hit your health goals.
+- **☁️ Cloud Sync**: All your historical data is safely stored in Supabase for long-term trend analysis.
 
 ![BioSync Logo](www/biosync_logo.png)
 
